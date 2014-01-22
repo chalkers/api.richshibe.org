@@ -3,11 +3,12 @@ Array::remove = (e) -> @[t..t] = [] if (t = @indexOf(e)) > -1
 
 http = require('http')
 https = require('https')
+plist = require('plist')
 
 http.createServer((request, response) ->
  
  response.writeHead(200, { 'Content-Type': 'application/json' })
- response.write JSON.stringify(calculateAverage())
+ response.write plist.build(calculateAverage()).toString()
  response.end()
  
 ).listen(process.env.PORT || 5000)
