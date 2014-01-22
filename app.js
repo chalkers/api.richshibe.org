@@ -21,7 +21,7 @@
     });
     response.write(JSON.stringify(calculateAverage()));
     return response.end();
-  }).listen(5000);
+  }).listen(process.env.PORT || 5000);
 
   console.log('Server Started');
 

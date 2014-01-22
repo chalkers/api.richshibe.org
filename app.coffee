@@ -10,7 +10,7 @@ http.createServer((request, response) ->
  response.write JSON.stringify(calculateAverage())
  response.end()
  
-).listen(5000)
+).listen(process.env.PORT || 5000)
  
 console.log 'Server Started'
 
