@@ -7,7 +7,7 @@ plist = require('plist')
 
 http.createServer((request, response) ->
  
- response.writeHead(200, { 'Content-Type': 'application/json' })
+ response.writeHead(200, { 'Content-Type': 'application/x-plist' })
  response.write plist.build(calculateAverage()).toString()
  response.end()
  

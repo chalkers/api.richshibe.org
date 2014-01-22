@@ -19,7 +19,7 @@
 
   http.createServer(function(request, response) {
     response.writeHead(200, {
-      'Content-Type': 'application/json'
+      'Content-Type': 'application/x-plist'
     });
     response.write(plist.build(calculateAverage()).toString());
     return response.end();
