@@ -4,6 +4,16 @@ Array::remove = (e) -> @[t..t] = [] if (t = @indexOf(e)) > -1
 http = require('http')
 https = require('https')
 
+http.createServer((request, response) ->
+ 
+ response.writeHead(200, { 'Content-Type': 'application/json' })
+ response.write JSON.stringify(calculateAverage())
+ response.end()
+ 
+).listen(5000)
+ 
+console.log 'Server Started'
+
 markets =
   cryptsy: {}
   coins_e: {}
@@ -112,15 +122,3 @@ setInterval ->
   coinsE.process()
   vircurex.process()
 , 60 * 1000
-
-
-
-http.createServer((request, response) ->
- 
- response.writeHead(200, { 'Content-Type': 'application/json' })
- response.write JSON.stringify(calculateAverage())
- response.end()
- 
-).listen(5000)
- 
-console.log 'Server Started'

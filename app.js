@@ -15,6 +15,16 @@
 
   https = require('https');
 
+  http.createServer(function(request, response) {
+    response.writeHead(200, {
+      'Content-Type': 'application/json'
+    });
+    response.write(JSON.stringify(calculateAverage()));
+    return response.end();
+  }).listen(5000);
+
+  console.log('Server Started');
+
   markets = {
     cryptsy: {},
     coins_e: {},
@@ -202,15 +212,5 @@
     coinsE.process();
     return vircurex.process();
   }, 60 * 1000);
-
-  http.createServer(function(request, response) {
-    response.writeHead(200, {
-      'Content-Type': 'application/json'
-    });
-    response.write(JSON.stringify(calculateAverage()));
-    return response.end();
-  }).listen(5000);
-
-  console.log('Server Started');
 
 }).call(this);
