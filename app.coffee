@@ -8,7 +8,7 @@ plist = require('plist')
 http.createServer((request, response) ->
  
  response.writeHead(200, { 'Content-Type': 'application/x-plist' })
- response.write plist.build(calculateAverage()).toString()
+ response.write plist.build(calculateAverages()).toString()
  response.end()
  
 ).listen(process.env.PORT || 5000)
@@ -16,10 +16,15 @@ http.createServer((request, response) ->
 console.log 'Server Started'
 
 markets =
-  cryptsy: {}
-  coins_e: {}
-  vircurex: {}
-  average: {}
+  doge_btc:
+    cryptsy: {}
+    coins_e: {}
+    vircurex: {}
+    average: {}
+  btc_usd:
+    mt_gox: {}
+    bitstamp: {}
+    average: {}
 
 class API
   onData: (chunk) ->
@@ -54,10 +59,10 @@ class CoinsE extends API
   onEnd: ->
     try
       @data = JSON.parse(@content)
-      markets.coins_e = price: @data.ltp * 1
+      markets.doge_btc.coins_e = price: @data.ltp * 1
         #trade_time: @data.systime
     catch error
-      markets.coins_e = price: undefined
+      markets.doge_btc.coins_e = price: undefined
       console.log error
     @content = ""
   
@@ -73,10 +78,10 @@ class Cryptsy extends API
     try
       @data = JSON.parse(@content)
       doge = @data.return.markets.DOGE
-      markets.cryptsy = price: doge.lasttradeprice * 1
+      markets.doge_btc.cryptsy = price: doge.lasttradeprice * 1
         #trade_time: doge.lasttradetime
     catch error
-      markets.cryptsy = price: undefined
+      markets.doge_btc.cryptsy = price: undefined
       console.log error
     @content = ""
 
@@ -94,32 +99,75 @@ class Vircurex extends API
   onEnd: ->
     try
       @data = JSON.parse(@content)
-      markets.vircurex = price: @data.value * 1
+      markets.doge_btc.vircurex = price: @data.value * 1
     catch error
-      markets.vircurex = price: undefined
+      markets.doge_btc.vircurex = price: undefined
       console.log error
     @content = ""
 
-calculateAverage = ->
-  prices = [markets.vircurex.price, markets.coins_e.price, markets.cryptsy.price]
+class MtGox extends API
+  constructor: (@market, @protocol=https)->
+
+  options: ->
+      host: 'data.mtgox.com'
+      path: "/api/1/#{@market}/ticker"
+      method: 'GET'
+      port: 443
+
+  onEnd: ->
+    try
+      @data = JSON.parse(@content)
+      markets.btc_usd.mt_gox = price: @data.return.avg.value * 1
+    catch error
+      markets.btc_usd.mt_gox = price: undefined
+      console.log error
+    @content = ""
+
+class Bitstamp extends API
+  constructor: (@protocol=https)->
+
+  options: ->
+      host: 'www.bitstamp.net'
+      path: "/api/ticker/"
+      method: 'GET'
+      port: 443
+
+  onEnd: ->
+    try
+      @data = JSON.parse(@content)
+      markets.btc_usd.bitstamp = price: @data.last * 1
+    catch error
+      markets.btc_usd.bitstamp = price: undefined
+      console.log error
+    @content = ""
+
+calculateAverages = ->
+  calculateAverage([markets.doge_btc.vircurex.price, markets.doge_btc.coins_e.price, markets.doge_btc.cryptsy.price], "doge_btc")
+  calculateAverage([markets.btc_usd.mt_gox.price, markets.btc_usd.bitstamp.price], "btc_usd")
+  markets
+
+calculateAverage = (prices, market)->
   prices.remove(undefined)
   average = 0
   average += price for price in prices
-  markets.average = price: (average / prices.length).toFixed(8) * 1
-  markets
+  markets[market].average = price: (average / prices.length).toFixed(8) * 1
+
 
 cryptsy = new Cryptsy(132)
 coinsE = new CoinsE("DOGE_BTC")
 vircurex = new Vircurex("DOGE")
+mtgox = new MtGox("BTCUSD")
+bitstamp = new Bitstamp()
 
 #Inital calls
-cryptsy.process()
-coinsE.process()
-vircurex.process()
-
-#Calls Every Minute
-setInterval ->
+processMarkets = ->
   cryptsy.process()
   coinsE.process()
   vircurex.process()
-, 60 * 1000
+  mtgox.process()
+  bitstamp.process()
+
+processMarkets()
+
+#Calls Every Minute
+setInterval processMarkets, 60 * 1000
