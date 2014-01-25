@@ -5,7 +5,7 @@ Simple Node.js API for Rich Shibe iOS app written in CoffeeScript.
 
 ## Development
 
-Modify app.coffee.
+Modify `app.coffee`.
 
 Compile it.
 
