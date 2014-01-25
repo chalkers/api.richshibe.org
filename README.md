@@ -7,16 +7,10 @@ Simple Node.js API for Rich Shibe iOS app written in CoffeeScript.
 
 Modify `app.coffee`.
 
-Compile it.
-
-```
-coffee -w -o ./ -c app.coffee
-```
-
 Run it.
 
 ```
-node app.js
+node app.coffee
 ```
 
 ## Deployment

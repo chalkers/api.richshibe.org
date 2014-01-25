@@ -7,5 +7,8 @@
     "node": "0.10.22",
     "npm": "1.3.14"
   },
-  "author": "Andrew Chalkley"
+  "author": "Andrew Chalkley",
+  "dependencies": {
+    "coffee-script": "~1.6.3"
+  }
 }
