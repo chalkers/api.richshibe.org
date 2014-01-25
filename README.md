@@ -10,7 +10,7 @@ Modify `app.coffee`.
 Run it.
 
 ```
-node app.coffee
+coffee app.coffee
 ```
 
 ## Deployment
