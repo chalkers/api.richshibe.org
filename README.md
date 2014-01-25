@@ -13,7 +13,7 @@ Compile it.
 coffee -w -o ./ -c app.coffee
 ```
 
-Run it
+Run it.
 
 ```
 node app.js
